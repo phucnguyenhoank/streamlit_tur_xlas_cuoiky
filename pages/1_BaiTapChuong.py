@@ -69,7 +69,6 @@ if uploaded_file is not None:
         elif option == 'Gradient':
             result = chapter3.Gradient(img_gray_np)
         
-        # Thêm các thuật toán khác nếu cần
         else:
             result = img_gray_np  # Placeholder nếu thuật toán chưa được cài đặt
         st.image(result, caption="Kết quả Chương 3", use_container_width=True)
@@ -87,12 +86,11 @@ if uploaded_file is not None:
         if option == 'Spectrum':
             result = chapter4.Spectrum(img_gray_np)
         elif option == 'FrequencyFilter':
-            D0 = st.slider("D0", 1, 100, 60)
-            n = st.slider("n", 1, 10, 2)
-            result = chapter4.FrequencyFilter(img_gray_np, D0, n)
+            result = chapter4.FrequencyFilter(img_gray_np)
+        elif option == 'DrawNotchRejectFilter':
+            result = chapter4.ApplyNotchFilter(img_gray_np)
         elif option == 'RemoveMoire':
             result = chapter4.RemoveMoire(img_gray_np)
-        # Thêm các thuật toán khác nếu cần
         else:
             result = img_gray_np  # Placeholder nếu thuật toán chưa được cài đặt
         st.image(result, caption="Kết quả Chương 4", use_container_width=True)
@@ -102,11 +100,10 @@ if uploaded_file is not None:
         st.header("Chương 9")
         option = st.selectbox(
             'Chọn thuật toán',
-            ['Erosion', 'Dilation', 'OpeningClosing', 'Boundary', 'HoleFill', 
-             'MyConnectedComponent', 'ConnectedComponent', 'CountRice']
+            ['Erosion', 'Dilation', 'OpeningClosing', 'Boundary', 'HoleFill', 'ConnectedComponent', 'CountRice']
         )
         st.write('Bạn đã chọn:', option)
-        
+    
         if option == 'Erosion':
             ksize = st.slider("Kích thước kernel", 1, 50, 45)
             result = chapter9.Erosion(img_gray_np, ksize)
@@ -116,6 +113,15 @@ if uploaded_file is not None:
         elif option == 'OpeningClosing':
             ksize = st.slider("Kích thước kernel", 1, 50, 5)
             result = chapter9.OpeningClosing(img_gray_np, ksize)
+        elif option == 'Boundary':
+            ksize = st.slider("Kích thước kernel", 1, 50, 5)
+            result = chapter9.Boundary(img_gray_np, ksize)
+        elif option == 'HoleFill':
+            result = chapter9.HoleFill(img_gray_np)
+        elif option == 'ConnectedComponent':
+            result = chapter9.ConnectedComponent(img_gray_np)
+        elif option == 'CountRice':
+            result = chapter9.CountRice(img_gray_np)
         # Thêm các thuật toán khác nếu cần
         else:
             result = img_gray_np  # Placeholder nếu thuật toán chưa được cài đặt

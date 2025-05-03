@@ -68,6 +68,23 @@ def DrawNotchRejectFilter(P=250, Q=180, uvs=[(44, 58), (40, 119), (86, 59), (82,
     H = CreateNotchRejectFilter(P, Q, uvs, D0, n)
     return (H * (L - 1)).astype(np.uint8)
 
+def ApplyNotchFilter(img: np.ndarray, uvs=[(44,58),(40,119),(86,59),(82,119)], D0=10, n=2):
+    # 1) chuẩn bị
+    P, Q = img.shape
+    # 2) sinh H
+    H = DrawNotchRejectFilter(P, Q, uvs, D0, n).astype(float) / 255.0
+    # 3) biến đổi Fourier
+    F = np.fft.fft2(img)
+    F_shift = np.fft.fftshift(F)
+    # 4) lọc
+    G_shift = H * F_shift
+    # 5) ngược phổ
+    g = np.fft.ifft2(np.fft.ifftshift(G_shift))
+    # 6) lấy cường độ (abs) và chuẩn hóa về uint8
+    g = np.abs(g)
+    g = 255*(g - g.min())/(g.max() - g.min())
+    return g.astype(np.uint8)
+
 def RemoveMoire(imgin, uvs=[(44, 58), (40, 119), (86, 59), (82, 119)], D0=10, n=2):
     M, N = imgin.shape
     P = cv2.getOptimalDFTSize(M)

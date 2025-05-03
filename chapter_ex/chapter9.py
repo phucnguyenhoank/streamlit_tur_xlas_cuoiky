@@ -53,62 +53,76 @@ def MyConnectedComponent(imgin, thresh=200, blur_ksize=7, base_color=150):
             print(f'{r:4d}   {count:5d}')
     return temp.astype(np.uint8)
 
-def ConnectedComponent(imgin, thresh=200, blur_ksize=7, base_color=150, add_text=True):
-    ret, temp = cv2.threshold(imgin, thresh, L - 1, cv2.THRESH_BINARY)
-    temp = cv2.medianBlur(temp, blur_ksize)
+def ConnectedComponent(imgin):
+    ret, temp = cv2.threshold(imgin, 200, L-1, cv2.THRESH_BINARY)
+    temp = cv2.medianBlur(temp, 7)
     dem, label = cv2.connectedComponents(temp)
-    print(f'Co {dem - 1} thanh phan lien thong')
-    a = np.zeros(dem, np.int64)
+    text = 'Co %d thanh phan lien thong' % (dem-1) 
+    print(text)
+
+    a = np.zeros(dem, np.int32)
     M, N = label.shape
-    for x in range(M):
-        for y in range(N):
+    color = 150
+    for x in range(0, M):
+        for y in range(0, N):
             r = label[x, y]
-            a[r] += 1
+            a[r] = a[r] + 1
             if r > 0:
-                label[x, y] += base_color
+                label[x,y] = label[x,y] + color
+
     for r in range(1, dem):
-        print(f'{r:4d} {a[r]:10d}')
+        print('%4d %10d' % (r, a[r]))
     label = label.astype(np.uint8)
-    if add_text:
-        text = f'Co {dem - 1} thanh phan lien thong'
-        cv2.putText(label, text, (1, 25), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2)
+    cv2.putText(label,text,(1,25),cv2.FONT_HERSHEY_SIMPLEX,1.0, (255,255,255),2)
     return label
 
-def CountRice(imgin, ksize=81, thresh=100, blur_ksize=3, base_color=150, add_text=True):
+def CountRice(imgin, ksize=81, thresh=None, min_area=100, blur_ksize=3, add_text=True):
+    # Tạo phần tử cấu trúc cho phép toán hình thái học
     w = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (ksize, ksize))
+    
+    # Thực hiện phép biến đổi Top-Hat
     temp = cv2.morphologyEx(imgin, cv2.MORPH_TOPHAT, w)
-    ret, temp = cv2.threshold(temp, thresh, L - 1, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    
+    # Phân ngưỡng
+    if thresh is None:
+        ret, temp = cv2.threshold(temp, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    else:
+        ret, temp = cv2.threshold(temp, thresh, 255, cv2.THRESH_BINARY)
+    
+    # Làm mịn ảnh bằng median blur
     temp = cv2.medianBlur(temp, blur_ksize)
+    
+    # Gán nhãn các thành phần liên thông
     dem, label = cv2.connectedComponents(temp)
-    print(f'Co {dem - 1} hat gao')
+    
+    # Tính diện tích của từng thành phần
     a = np.zeros(dem, np.int64)
-    M, N = label.shape
-    for x in range(M):
-        for y in range(N):
+    for x in range(label.shape[0]):
+        for y in range(label.shape[1]):
             r = label[x, y]
             a[r] += 1
-            if r > 0:
-                label[x, y] += base_color
-    for r in range(dem):
-        print(f'{r:4d} {a[r]:10d}')
     
-    max_val = a[1]
-    rmax = 1
-    for r in range(2, dem):
-        if a[r] > max_val:
-            max_val = a[r]
-            rmax = r
-    xoa = [r for r in range(1, dem) if a[r] < 0.5 * max_val]
+    # Lọc các thành phần nhỏ
+    xoa = [r for r in range(1, dem) if a[r] < min_area]
     
-    for x in range(M):
-        for y in range(N):
-            r = label[x, y]
-            if r > 0:
-                r -= base_color
-                if r in xoa:
-                    label[x, y] = 0
-    label = label.astype(np.uint8)
+    # Tạo mask cho các thành phần lớn
+    mask = np.zeros_like(label, dtype=np.uint8)
+    for r in range(1, dem):
+        if r not in xoa:
+            mask[label == r] = 255
+    
+    # Đếm lại số thành phần sau khi lọc
+    dem, filtered_label = cv2.connectedComponents(mask)
+    print(f'Có {dem - 1} hạt gạo')
+    
+    # Vẽ đường viền trên ảnh gốc
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    output = cv2.cvtColor(imgin, cv2.COLOR_GRAY2BGR) if len(imgin.shape) == 2 else imgin.copy()
+    cv2.drawContours(output, contours, -1, (0, 255, 0), 2)
+    
+    # Thêm văn bản nếu cần
     if add_text:
         text = f'Co {dem - 1} hat gao'
-        cv2.putText(label, text, (1, 25), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2)
-    return label
+        cv2.putText(output, text, (1, 25), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
+    
+    return output
