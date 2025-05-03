@@ -11,5 +11,5 @@ st.markdown("""
 
 **Sinh viên thực hiện:**  
 - Nguyễn Hoàng Phúc — 22110400  
-- Phạm Trung Kỳ — 22110XXX  
+- Phạm Trung Kỳ — 22110361  
 """)
