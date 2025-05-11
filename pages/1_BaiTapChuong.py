@@ -3,6 +3,7 @@ from PIL import Image
 import numpy as np
 #include "chapter3.py" as chapter3
 from chapter_ex import chapter3, chapter4, chapter9
+from bt_chuong import chuong3, chuong4, chuong9
 
 st.title("Bài tập chương")
 

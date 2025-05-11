@@ -75,6 +75,6 @@ if st.session_state["reload"]:
     st.write("### 🔢 Kết quả dự đoán:")
     for i in range(8):
         row_preds = predicted[i*8:(i+1)*8].numpy()
-        st.write(" ".join(str(num) for num in row_preds))
+        st.write("## " + " ".join(str(num) for num in row_preds))
 
     st.session_state["reload"] = False

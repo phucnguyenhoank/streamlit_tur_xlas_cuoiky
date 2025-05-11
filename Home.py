@@ -11,5 +11,10 @@ st.markdown("""
 
 **Sinh viên thực hiện:**  
 - Nguyễn Hoàng Phúc — 22110400  
+  - 📞 SDT: 0376816194  
+  - 📧 Email: phucnguyeho@gmail.com 
+
 - Phạm Trung Kỳ — 22110361  
+  - 📞 SDT: 0862099881
+  - 📧 Email: phamtrungky12a6@gmail.com
 """)
