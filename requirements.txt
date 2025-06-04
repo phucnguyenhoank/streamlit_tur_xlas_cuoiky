@@ -4,3 +4,4 @@ torch
 supervision
 pandas
 numpy
+torchvision
