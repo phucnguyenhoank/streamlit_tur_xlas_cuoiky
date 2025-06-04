@@ -8,8 +8,18 @@ This project demonstrates a variety of image processing techniques, ranging from
 * Basic OCR
 * License plate recognition
 
-### How to Run the Project
+A demo video is available for download in this repository.
+
+---
+
+### How to Run the Project using Docker
+
+To run the app locally with Docker:
 
 ```bash
-streamlit run home.py
+docker run -p 8501:8501 phucnguyenhoank/xlas-ck:1.0
 ```
+
+After the container starts, open your browser and go to:
+
+👉 [http://localhost:8501](http://localhost:8501)
